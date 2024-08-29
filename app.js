@@ -14,6 +14,10 @@ dotenv.config();
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+app.use(express.json());
+app.use(express.urlencoded({extended: false}));
+
+
 app.use(express.static("public"));
 
 app.get("/search", (req, res) => {
@@ -22,11 +26,12 @@ app.get("/search", (req, res) => {
 
 app.get("/results", async (req, res) => {
     const theMovieApi = new MovieApi();
-    const results = await theMovieApi.search("movie", "query=Jack Reacher");
+    const theQuery = req.query.search;
+    const results = await theMovieApi.search("movie", `query=${theQuery}`);
 
 
 
-    res.render("movies");
+    res.render("movies", {data: results.message, query: theQuery});
 });
 
 const thePort = process.env.APP_PORT ?? 3000;
